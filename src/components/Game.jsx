@@ -3,7 +3,7 @@ import Board from './Board';
 import './styles.css';
 import { connect } from 'react-redux';
 
- class Game extends React.Component {
+class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -13,7 +13,6 @@ import { connect } from 'react-redux';
       stepNumber: 0,
       xIsNext: true,
     };
-    console.log(props);
   }
 
 
@@ -21,15 +20,14 @@ import { connect } from 'react-redux';
     const action = {
       type: 'NEXT',
       state: this.props.state,
-      i: i
-
-    }
+      i: i,
+    };
     this.props.dispatch(action);
   }
 
   handleClick(i) {
 
-    // const history = this.state.history.slice(0, this.state.stepNumber + 1)
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (this.calculateWinner(squares) || squares[i]) {
@@ -47,42 +45,51 @@ import { connect } from 'react-redux';
   }
 
   jumpTo(step) {
-    this.setState({
+    const action = {
+      type: 'JUMP',
       stepNumber: step,
       xIsNext: (step % 2) === 0,
-    })
+      state: this.props.state
+    };
+    this.props.dispatch(action);
   }
 
   calculateWinner(squares) {
-     const lines = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-     ];
-     for (let i = 0; i < lines.length; i++){
-       const [a, b, c] = lines[i];
-       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-         return squares[a];
-       }
-     }
-     return null;
-   }
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++){
+      const [a, b, c] = lines[i];
+      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+        const action = {
+          type: 'WINNER',
+          winner: this.props.state.winner,
+          state: this.props.state
+        };
+        this.props.dispatch(action);
+        return squares[a];
+      }
+    }
+    return null;
+  }
 
 
   render() {
     const history = this.props.state.history;
-    const current = history[history.length-1];
+    const current = history[this.props.state.stepNumber];
     const winner = this.calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
       const desc = move ?
-      'Go to move #' + move :
-      'Go to game start';
+        'Go to move #' + move :
+        'Go to game start';
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
@@ -92,7 +99,7 @@ import { connect } from 'react-redux';
 
     let status;
     if (winner) {
-      status = 'Winner: ' + winner
+      status = 'Winner: ' + winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }

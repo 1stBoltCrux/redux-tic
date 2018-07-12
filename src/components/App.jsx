@@ -9,7 +9,7 @@ import Game from './Game';
 
 class App extends React.Component{
   constructor(props){
-    super(props)
+    super(props);
   }
 
   render(){
@@ -23,9 +23,9 @@ class App extends React.Component{
 
 
 const mapStateToProps = state => {
-return {
-state: state
-}
+  return {
+    state: state
+  };
 };
 
 export default withRouter(connect(mapStateToProps)(App));

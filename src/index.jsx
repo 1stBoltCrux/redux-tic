@@ -9,7 +9,7 @@ import squareReducer from './reducers/square-reducer';
 const store = createStore(squareReducer);
 
 let unsubscribe = store.subscribe(() =>
-  console.log(store.getState())
+  store.getState()
 );
 
 const render = (Component) => {
